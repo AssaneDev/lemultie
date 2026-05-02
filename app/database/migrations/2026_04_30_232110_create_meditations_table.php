@@ -1,0 +1,39 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('meditations', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->string('slug')->unique();
+            $table->text('description')->nullable();
+            $table->string('audio_file')->nullable();
+            $table->string('video_file')->nullable();
+            $table->string('thumbnail')->nullable();
+            $table->integer('duration_seconds')->nullable();
+            $table->enum('type', ['audio', 'video', 'both'])->default('audio');
+            $table->enum('theme', ['relaxation', 'sommeil', 'concentration', 'energie', 'guerison', 'autre'])->default('autre');
+            $table->boolean('is_active')->default(true);
+            $table->boolean('is_premium')->default(false);
+            $table->integer('listen_count')->default(0);
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('meditations');
+    }
+};
