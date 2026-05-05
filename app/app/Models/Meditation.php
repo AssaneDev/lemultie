@@ -8,7 +8,7 @@ class Meditation extends Model
 {
     protected $fillable = [
         'title', 'slug', 'description', 'audio_file', 'video_file',
-        'thumbnail', 'duration_seconds', 'type', 'theme',
+        'youtube_url', 'thumbnail', 'duration_seconds', 'type', 'theme',
         'is_active', 'is_premium', 'listen_count',
     ];
 

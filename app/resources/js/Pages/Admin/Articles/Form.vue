@@ -1,5 +1,6 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import AiWriter from '@/Components/AiWriter.vue';
 import { useForm, Link } from '@inertiajs/vue3';
 
 const props = defineProps({ article: Object });
@@ -55,16 +56,16 @@ function autoSlug() {
                             class="w-full bg-gray-800 border border-gray-600 rounded-xl px-4 py-3 text-gray-400 focus:border-green-500 focus:outline-none font-mono text-sm">
                     </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Extrait / Résumé</label>
-                    <textarea v-model="form.excerpt" rows="2"
-                        class="w-full bg-gray-800 border border-gray-600 rounded-xl px-4 py-3 text-white focus:border-green-500 focus:outline-none resize-none"></textarea>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Contenu * <span class="text-gray-500 font-normal">(HTML accepté)</span></label>
-                    <textarea v-model="form.content" rows="12" required
-                        class="w-full bg-gray-800 border border-gray-600 rounded-xl px-4 py-3 text-white focus:border-green-500 focus:outline-none resize-y font-mono text-sm"></textarea>
-                </div>
+                <AiWriter v-model="form.excerpt" field-label="extrait / résumé d'article" :context="form.title" :rows="2">
+                    <template #label>
+                        <label class="block text-sm font-medium text-gray-300">Extrait / Résumé</label>
+                    </template>
+                </AiWriter>
+                <AiWriter v-model="form.content" field-label="contenu complet d'article" :context="form.title" :rows="12">
+                    <template #label>
+                        <label class="block text-sm font-medium text-gray-300">Contenu * <span class="text-gray-500 font-normal">(HTML accepté)</span></label>
+                    </template>
+                </AiWriter>
                 <div class="flex gap-8">
                     <label class="flex items-center gap-3 cursor-pointer">
                         <input type="checkbox" v-model="form.is_published" class="w-5 h-5 accent-green-500">

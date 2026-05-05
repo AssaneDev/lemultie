@@ -2,9 +2,17 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import AudioPlayer from '@/Components/AudioPlayer.vue';
 import { Link } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 const props = defineProps({
     meditation: Object,
+});
+
+const youtubeEmbedId = computed(() => {
+    const url = props.meditation?.youtube_url;
+    if (!url) return null;
+    const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    return match ? match[1] : null;
 });
 
 const themeLabels = {
@@ -48,30 +56,36 @@ function formatDuration(seconds) {
                     </div>
                 </div>
 
-                <!-- Thumbnail -->
-                <div v-if="meditation.thumbnail" class="rounded-2xl overflow-hidden mb-8 aspect-video">
-                    <img :src="meditation.thumbnail" :alt="meditation.title" class="w-full h-full object-cover">
+                <!-- YouTube embed (priorité sur thumbnail) -->
+                <div v-if="youtubeEmbedId" class="rounded-2xl overflow-hidden mb-8 aspect-video">
+                    <iframe
+                        :src="`https://www.youtube.com/embed/${youtubeEmbedId}`"
+                        class="w-full h-full"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen
+                    ></iframe>
                 </div>
-                <div v-else class="rounded-2xl bg-gradient-to-br from-green-900/20 to-black aspect-video flex items-center justify-center mb-8">
-                    <div class="text-center">
-                        <div class="text-8xl mb-4 opacity-20">🧘</div>
-                        <div class="w-16 h-1 bg-green-500/30 mx-auto rounded-full"></div>
+
+                <!-- Thumbnail (si pas de YouTube) -->
+                <template v-else>
+                    <div v-if="meditation.thumbnail" class="rounded-2xl overflow-hidden mb-8 aspect-video">
+                        <img :src="meditation.thumbnail" :alt="meditation.title" class="w-full h-full object-cover">
                     </div>
-                </div>
+                    <div v-else class="rounded-2xl bg-gradient-to-br from-green-900/20 to-black aspect-video flex items-center justify-center mb-8">
+                        <div class="text-center">
+                            <div class="text-8xl mb-4 opacity-20">🧘</div>
+                            <div class="w-16 h-1 bg-green-500/30 mx-auto rounded-full"></div>
+                        </div>
+                    </div>
+                </template>
 
                 <!-- Audio Player -->
-                <div v-if="meditation.audio_file || meditation.type !== 'video'" class="mb-8">
+                <div v-if="meditation.audio_file && (meditation.type === 'audio' || meditation.type === 'both')" class="mb-8">
                     <AudioPlayer
-                        :src="meditation.audio_file"
+                        :src="`/storage/${meditation.audio_file}`"
                         :title="meditation.title"
                     />
-                </div>
-
-                <!-- Video -->
-                <div v-if="meditation.video_file && (meditation.type === 'video' || meditation.type === 'both')" class="mb-8 rounded-2xl overflow-hidden">
-                    <video controls class="w-full rounded-2xl" :poster="meditation.thumbnail">
-                        <source :src="meditation.video_file">
-                    </video>
                 </div>
 
                 <!-- Description -->

@@ -1,19 +1,40 @@
 <script setup>
-import { ref, computed } from 'vue';
-import { Link, usePage } from '@inertiajs/vue3';
+import { ref, computed, onMounted } from 'vue';
+import { Link, usePage, router } from '@inertiajs/vue3';
+import PwaBottomNav from '@/Components/PwaBottomNav.vue';
+import PwaInstallBanner from '@/Components/PwaInstallBanner.vue';
 
 const page = usePage();
 const user = computed(() => page.props.auth?.user);
 const mobileMenuOpen = ref(false);
+const isHome = computed(() => page.url === '/');
+const isPwa = ref(false);
+onMounted(() => {
+    isPwa.value = window.matchMedia('(display-mode: standalone)').matches
+        || window.navigator.standalone === true;
+});
 
 const navLinks = [
-    { name: 'Accueil', href: '/', route: 'home' },
-    { name: 'Services', href: '/services', route: 'services.index' },
-    { name: 'Formations', href: '/formations', route: 'formations.index' },
-    { name: 'Méditations', href: '/meditations', route: 'meditations.index' },
-    { name: 'Blog', href: '/blog', route: 'articles.index' },
-    { name: 'Conférences', href: '/conferences', route: 'conferences.index' },
+    { name: 'Accueil',     href: '/',            anchor: null },
+    { name: 'Services',    href: '/services',    anchor: '#services' },
+    { name: 'Formations',  href: '/formations',  anchor: '#formations' },
+    { name: 'Méditations', href: '/meditations', anchor: '#meditations' },
+    { name: 'Blog',        href: '/blog',        anchor: '#blog' },
+    { name: 'Contact',     href: '/#contact',    anchor: '#contact' },
 ];
+
+function navHref(link) {
+    if (isHome.value && link.anchor) return link.anchor;
+    return link.href;
+}
+
+function scrollToSection(e, link) {
+    if (!isHome.value || !link.anchor) return;
+    e.preventDefault();
+    const el = document.querySelector(link.anchor);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+    mobileMenuOpen.value = false;
+}
 </script>
 
 <template>
@@ -40,14 +61,15 @@ const navLinks = [
 
                     <!-- Desktop Nav -->
                     <div class="hidden md:flex items-center space-x-8">
-                        <Link
+                        <a
                             v-for="link in navLinks"
-                            :key="link.route"
-                            :href="link.href"
-                            class="text-sm text-gray-300 hover:text-green-400 transition-colors duration-200"
+                            :key="link.href"
+                            :href="navHref(link)"
+                            @click="scrollToSection($event, link)"
+                            class="text-sm text-gray-300 hover:text-green-400 transition-colors duration-200 cursor-pointer"
                         >
                             {{ link.name }}
-                        </Link>
+                        </a>
                     </div>
 
                     <!-- Auth -->
@@ -92,15 +114,15 @@ const navLinks = [
 
             <!-- Mobile menu -->
             <div v-if="mobileMenuOpen" class="md:hidden bg-black/95 border-t border-green-900/30 px-4 py-4 space-y-3">
-                <Link
+                <a
                     v-for="link in navLinks"
-                    :key="link.route"
-                    :href="link.href"
-                    class="block text-gray-300 hover:text-green-400 py-2"
-                    @click="mobileMenuOpen = false"
+                    :key="link.href"
+                    :href="navHref(link)"
+                    @click="scrollToSection($event, link)"
+                    class="block text-gray-300 hover:text-green-400 py-2 cursor-pointer"
                 >
                     {{ link.name }}
-                </Link>
+                </a>
                 <div class="pt-3 border-t border-green-900/30 flex flex-col space-y-2">
                     <template v-if="user">
                         <Link :href="route('dashboard')" class="text-gray-300">Mon espace</Link>
@@ -114,12 +136,18 @@ const navLinks = [
         </nav>
 
         <!-- Main content -->
-        <main class="pt-16">
+        <main :class="['pt-16', isPwa ? 'pb-20' : '']">
             <slot />
         </main>
 
-        <!-- Footer -->
-        <footer class="bg-black border-t border-green-900/20 py-12 mt-20">
+        <!-- PWA Install Banner (navigateur, pas encore installé) -->
+        <PwaInstallBanner v-if="!isPwa" />
+
+        <!-- PWA Bottom Nav (standalone uniquement) -->
+        <PwaBottomNav v-if="isPwa" />
+
+        <!-- Footer (masqué en PWA) -->
+        <footer v-if="!isPwa" class="bg-black border-t border-green-900/20 py-12 mt-20">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div>

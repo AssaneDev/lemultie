@@ -1,5 +1,6 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import AiWriter from '@/Components/AiWriter.vue';
 import { useForm, Link } from '@inertiajs/vue3';
 
 const props = defineProps({ formation: Object });
@@ -44,11 +45,11 @@ function autoSlug() {
                     <input v-model="form.title" @input="autoSlug" type="text" required
                         class="w-full bg-gray-800 border border-gray-600 rounded-xl px-4 py-3 text-white focus:border-green-500 focus:outline-none">
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Description *</label>
-                    <textarea v-model="form.description" rows="3" required
-                        class="w-full bg-gray-800 border border-gray-600 rounded-xl px-4 py-3 text-white focus:border-green-500 focus:outline-none resize-none"></textarea>
-                </div>
+                <AiWriter v-model="form.description" field-label="description de formation" :context="form.title" :rows="3">
+                    <template #label>
+                        <label class="block text-sm font-medium text-gray-300">Description *</label>
+                    </template>
+                </AiWriter>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Prix (€) *</label>
@@ -74,11 +75,11 @@ function autoSlug() {
                             class="w-full bg-gray-800 border border-gray-600 rounded-xl px-4 py-3 text-white focus:border-green-500 focus:outline-none">
                     </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Contenu détaillé</label>
-                    <textarea v-model="form.content" rows="8"
-                        class="w-full bg-gray-800 border border-gray-600 rounded-xl px-4 py-3 text-white focus:border-green-500 focus:outline-none resize-y font-mono text-sm"></textarea>
-                </div>
+                <AiWriter v-model="form.content" field-label="contenu détaillé de formation" :context="form.title" :rows="8">
+                    <template #label>
+                        <label class="block text-sm font-medium text-gray-300">Contenu détaillé</label>
+                    </template>
+                </AiWriter>
                 <div class="flex gap-8">
                     <label class="flex items-center gap-3 cursor-pointer">
                         <input type="checkbox" v-model="form.is_active" class="w-5 h-5 accent-green-500">

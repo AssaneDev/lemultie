@@ -1,5 +1,6 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import AiWriter from '@/Components/AiWriter.vue';
 import { useForm, Link } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -93,20 +94,18 @@ function autoSlug() {
                 </div>
 
                 <!-- Description -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Description courte *</label>
-                    <textarea v-model="form.description" rows="3" required
-                        class="w-full bg-gray-800 border border-gray-600 rounded-xl px-4 py-3 text-white focus:border-green-500 focus:outline-none resize-none"
-                        placeholder="Résumé du service (affiché dans les cartes)"></textarea>
-                </div>
+                <AiWriter v-model="form.description" field-label="description courte de service" :context="form.title" :rows="3">
+                    <template #label>
+                        <label class="block text-sm font-medium text-gray-300">Description courte *</label>
+                    </template>
+                </AiWriter>
 
                 <!-- Content -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Contenu détaillé</label>
-                    <textarea v-model="form.content" rows="8"
-                        class="w-full bg-gray-800 border border-gray-600 rounded-xl px-4 py-3 text-white focus:border-green-500 focus:outline-none resize-y font-mono text-sm"
-                        placeholder="Contenu HTML ou texte long..."></textarea>
-                </div>
+                <AiWriter v-model="form.content" field-label="contenu détaillé de service" :context="form.title" :rows="8">
+                    <template #label>
+                        <label class="block text-sm font-medium text-gray-300">Contenu détaillé</label>
+                    </template>
+                </AiWriter>
 
                 <!-- Toggles -->
                 <div class="flex gap-8">
